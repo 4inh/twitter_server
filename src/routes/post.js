@@ -1,6 +1,6 @@
 import { Router } from "express";
-import Post from "../models/Post";
-import authMiddleware from "../middlewares/authMiddleware";
+import Post from "../models/Post.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 
 const router = Router();
 
@@ -15,7 +15,6 @@ router.get("/", async (req, res) => {
 });
 
 // Create a new post and emit via Socket.io
-// @ts-ignore
 router.post("/", authMiddleware, async (req, res) => {
     try {
         const { content, media, tags, mentions, visibility } = req.body;
@@ -39,7 +38,6 @@ router.post("/", authMiddleware, async (req, res) => {
 });
 
 // Update a post
-// @ts-ignore
 router.put("/:id", authMiddleware, async (req, res) => {
     try {
         const updatedPost = await Post.findByIdAndUpdate(

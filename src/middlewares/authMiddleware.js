@@ -1,15 +1,6 @@
-import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-declare global {
-    namespace Express {
-        interface Request {
-            user?: any;
-        }
-    }
-}
-
-const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+const authMiddleware = (req, res, next) => {
     const token = req.header("Authorization");
 
     if (!token) {
@@ -19,10 +10,10 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     }
 
     try {
-        const decoded = jwt.verify(
-            token.replace("Bearer ", ""),
-            process.env.JWT_SECRET!
-        );
+        if (!process.env.JWT_SECRET) {
+            throw new Error("Missing jwt secret");
+        }
+        const decoded = jwt.verify(token.replace("Bearer ", ""));
         req.user = decoded;
         next();
     } catch (error) {

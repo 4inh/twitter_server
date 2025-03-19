@@ -1,6 +1,7 @@
-import { Schema, model, Types } from "mongoose";
+import { Types } from "mongoose";
+import mongoose from "mongoose";
 
-const PostSchema = new Schema(
+const PostSchema = new mongoose.Schema(
     {
         content: { type: String, required: true, trim: true },
 
@@ -43,4 +44,6 @@ const PostSchema = new Schema(
     { timestamps: true }
 );
 
-export default model("Post", PostSchema);
+const Post = mongoose.model("Post", PostSchema);
+
+export default Post;

@@ -1,12 +1,12 @@
 import express from "express";
-import User from "../models/User";
+import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
 // Register a new user
-router.post("/register", async (req, res): Promise<any> => {
+router.post("/register", async (req, res) => {
     try {
         const { username, email, password } = req.body;
 
@@ -32,7 +32,7 @@ router.post("/register", async (req, res): Promise<any> => {
 });
 
 // Login user
-router.post("/login", async (req, res): Promise<any> => {
+router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
@@ -45,10 +45,11 @@ router.post("/login", async (req, res): Promise<any> => {
         if (!isMatch) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
-
+        if (!process.env.JWT_SECRET) {
+            throw new Error("Missing jwt secret");
+        }
         const token = jwt.sign(
             { id: user._id, role: user.role },
-            process.env.JWT_SECRET!,
             {
                 expiresIn: "7d",
             }
