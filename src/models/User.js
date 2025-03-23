@@ -8,6 +8,10 @@ const UserSchema = new mongoose.Schema(
             unique: true,
             trim: true,
         },
+        displayName: {
+            type: String,
+            trim: true,
+        },
         email: {
             type: String,
             required: true,
@@ -29,6 +33,12 @@ const UserSchema = new mongoose.Schema(
             enum: ["user", "admin"],
             default: "user",
         },
+        friends: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
     },
     { timestamps: true }
 );
