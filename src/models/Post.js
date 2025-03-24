@@ -7,17 +7,17 @@ const PostSchema = new mongoose.Schema(
 
         author: { type: Types.ObjectId, ref: "User", required: true }, // Reference to User model
 
-        media: [
-            {
-                url: { type: String, required: true }, // Image/Video URL
-                type: {
-                    type: String,
-                    enum: ["image", "video"],
-                    required: true,
-                },
-            },
-        ],
-
+        // media: [
+        //     {
+        //         url: { type: String, required: true }, // Image/Video URL
+        //         type: {
+        //             type: String,
+        //             enum: ["image", "video"],
+        //             required: true,
+        //         },
+        //     },
+        // ],
+        media: [{ type: String, required: true }],
         likes: [{ type: Types.ObjectId, ref: "User" }], // Users who liked the post
 
         comments: [

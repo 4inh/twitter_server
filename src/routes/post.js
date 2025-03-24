@@ -7,7 +7,15 @@ const router = Router();
 // Get all posts
 router.get("/", async (req, res) => {
     try {
-        const posts = await Post.find().sort({ createdAt: -1 });
+        const posts = await Post.find()
+            .populate("author", "username email displayName profilePicture") // Populate author with selected fields
+            .populate("likes", "username email displayName profilePicture") // Populate likes to get user details
+            .populate(
+                "comments.user",
+                "username email displayName profilePicture"
+            ) // Populate user in comments
+            .populate("mentions", "username email displayName profilePicture")
+            .sort({ createdAt: -1 });
         res.json(posts);
     } catch (err) {
         res.status(500).json({ error: "Error fetching posts" });
@@ -59,6 +67,48 @@ router.delete("/:id", authMiddleware, async (req, res) => {
         res.json({ message: "Post deleted" });
     } catch (err) {
         res.status(500).json({ error: "Error deleting post" });
+    }
+});
+
+router.get("/top-tags", async (req, res) => {
+    try {
+        const topTags = await Post.aggregate([
+            { $unwind: "$tags" }, // Deconstruct the tags array
+            { $group: { _id: "$tags", count: { $sum: 1 } } }, // Count each tag
+            { $sort: { count: -1 } }, // Sort by count descending
+            { $limit: 5 }, // Get top 5
+        ]);
+
+        res.json(topTags);
+    } catch (err) {
+        res.status(500).json({ error: "Error fetching top tags" });
+    }
+});
+
+router.get("/search", async (req, res) => {
+    try {
+        const { query } = req.query;
+
+        if (!query) {
+            return res.status(400).json({ error: "Query is required" });
+        }
+
+        const posts = await Post.find({
+            $or: [
+                { tags: { $regex: query, $options: "i" } }, // Search by tag
+                { content: { $regex: query, $options: "i" } }, // Search by content
+            ],
+        })
+            .populate({
+                path: "author",
+                match: { username: { $regex: query, $options: "i" } }, // Search by username
+                select: "username email",
+            })
+            .sort({ createdAt: -1 });
+
+        res.json(posts);
+    } catch (err) {
+        res.status(500).json({ error: "Error searching posts" });
     }
 });
 

@@ -13,7 +13,10 @@ const authMiddleware = (req, res, next) => {
         if (!process.env.JWT_SECRET) {
             throw new Error("Missing jwt secret");
         }
-        const decoded = jwt.verify(token.replace("Bearer ", ""));
+        const decoded = jwt.verify(
+            token.replace("Bearer ", ""),
+            process.env.JWT_SECRET
+        );
         req.user = decoded;
         next();
     } catch (error) {
