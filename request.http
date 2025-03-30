@@ -12,9 +12,18 @@ POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
 {
-    "email": "abc2@123.com",
+    "email": "abc@123.com",
     "password": "123456"
 }
+###
+PUT http://localhost:5000/api/users
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkNmVkOTcwNTJjMDRmNGE3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzMxMjI3OSwiZXhwIjoxNzQzOTE3MDc5fQ.ET0wC9LVto-0jSWyzNqlTg0O4v-_fPE5BTBcvzHYlRs
+
+{
+    "displayName": "abc999@123.com"
+}
+
 
 ###
 POST http://localhost:5000/api/posts
@@ -42,6 +51,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGRkO
 ###
 GET http://localhost:5000/api/posts
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MzQyMzBmZGU3NTBjNjg0NDQ4YmUzZmUiLCJpYXQiOjE2NjUyODQ2Mzh9.jQ7426OnoMRBEgmykigALosgiJuyxiyf_gJ7om4aHFE
+###
+GET http://localhost:5000/api/posts/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkNmVkOTcwNTJjMDRmNGE3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzMxNDI4NywiZXhwIjoxNzQzOTE5MDg3fQ.lzaBnpmt_O6wFXZcETDxY__vJGwjLr8S3te-KuAawks
 
 ###
 GET http://localhost:5000/api/posts/67e24bbf98c9c63d86a7e030

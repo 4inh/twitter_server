@@ -86,105 +86,98 @@ router.get("/:id", authMiddleware, async (req, res) => {
 });
 
 // Update user
-router.put(
-    "/",
-    authMiddleware,
-    upload.single("profilePicture"),
-    async (req, res) => {
-        try {
-            const { displayName, email, currentPassword, newPassword } =
-                req.body;
-            const updateData = {};
+router.put("/", authMiddleware, upload.single("avatar"), async (req, res) => {
+    try {
+        const { displayName, email, currentPassword, newPassword } = req.body;
 
-            // Add fields to update if provided
-            if (displayName) updateData.displayName = displayName;
-            if (email) updateData.email = email.toLowerCase();
+        const updateData = {};
 
-            // Handle profile picture upload if provided
-            if (req.file) {
-                const uploadResult = await new Promise((resolve, reject) => {
-                    cloudinary.uploader
-                        .upload_stream(
-                            { folder: "profile_pictures" },
-                            (error, result) => {
-                                if (error) return reject(error);
-                                resolve(result);
-                            }
-                        )
-                        .end(req.file.buffer);
-                });
+        // Add fields to update if provided
+        if (displayName) updateData.displayName = displayName;
+        if (email) updateData.email = email.toLowerCase();
 
-                updateData.profilePicture = uploadResult.secure_url;
-            }
+        // Handle profile picture upload if provided
+        if (req.file) {
+            const uploadResult = await new Promise((resolve, reject) => {
+                cloudinary.uploader
+                    .upload_stream(
+                        { folder: "profile_pictures" },
+                        (error, result) => {
+                            if (error) return reject(error);
+                            resolve(result);
+                        }
+                    )
+                    .end(req.file.buffer);
+            });
 
-            // Handle password change if provided
-            if (newPassword && currentPassword) {
-                // Find user to verify current password
-                const user = await User.findById(req.user.id);
+            updateData.profilePicture = uploadResult.secure_url;
+        }
 
-                // Verify current password
-                const isMatch = await bcrypt.compare(
-                    currentPassword,
-                    user.password
-                );
-                if (!isMatch) {
-                    return res
-                        .status(400)
-                        .json(
-                            formatResponse(
-                                "Current password is incorrect",
-                                null,
-                                "INVALID_PASSWORD"
-                            )
-                        );
-                }
+        // Handle password change if provided
+        if (newPassword && currentPassword) {
+            // Find user to verify current password
+            const user = await User.findById(req.user.id);
 
-                // Hash new password
-                const salt = await bcrypt.genSalt(10);
-                updateData.password = await bcrypt.hash(newPassword, salt);
-            }
-
-            // Update user
-            const updatedUser = await User.findByIdAndUpdate(
-                req.user.id,
-                updateData,
-                { new: true }
-            ).select("-password");
-
-            if (!updatedUser) {
-                return res
-                    .status(404)
-                    .json(
-                        formatResponse("User not found", null, "USER_NOT_FOUND")
-                    );
-            }
-
-            res.json(
-                formatResponse("User updated successfully", updatedUser, null)
+            // Verify current password
+            const isMatch = await bcrypt.compare(
+                currentPassword,
+                user.password
             );
-        } catch (err) {
-            console.error("Error updating user:", err);
-
-            // Handle duplicate key error (username or email already exists)
-            if (err.code === 11000) {
-                const field = Object.keys(err.keyPattern)[0];
+            if (!isMatch) {
                 return res
                     .status(400)
                     .json(
                         formatResponse(
-                            `${field} already exists`,
+                            "Current password is incorrect",
                             null,
-                            "DUPLICATE_VALUE"
+                            "INVALID_PASSWORD"
                         )
                     );
             }
 
-            res.status(500).json(
-                formatResponse("Failed to update user", null, err.message)
-            );
+            // Hash new password
+            const salt = await bcrypt.genSalt(10);
+            updateData.password = await bcrypt.hash(newPassword, salt);
         }
+
+        // Update user
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.id,
+            updateData,
+            { new: true }
+        ).select("-password");
+
+        if (!updatedUser) {
+            return res
+                .status(404)
+                .json(formatResponse("User not found", null, "USER_NOT_FOUND"));
+        }
+
+        res.json(
+            formatResponse("User updated successfully", updatedUser, null)
+        );
+    } catch (err) {
+        console.error("Error updating user:", err);
+
+        // Handle duplicate key error (username or email already exists)
+        if (err.code === 11000) {
+            const field = Object.keys(err.keyPattern)[0];
+            return res
+                .status(400)
+                .json(
+                    formatResponse(
+                        `${field} already exists`,
+                        null,
+                        "DUPLICATE_VALUE"
+                    )
+                );
+        }
+
+        res.status(500).json(
+            formatResponse("Failed to update user", null, err.message)
+        );
     }
-);
+});
 
 // Delete user account
 router.delete("/:id", authMiddleware, async (req, res) => {

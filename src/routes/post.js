@@ -239,6 +239,30 @@ router.get("/", async (req, res) => {
         );
     }
 });
+router.get("/me", authMiddleware, async (req, res) => {
+    try {
+        const posts = await Post.find({
+            author: {
+                _id: req.user.id,
+            },
+        })
+            .populate("author", "username email displayName profilePicture")
+            .populate("likes", "username email displayName profilePicture")
+            .populate(
+                "comments.user",
+                "username email displayName profilePicture"
+            )
+            .populate("mentions", "username email displayName profilePicture")
+            .sort({ createdAt: -1 });
+
+        res.json(formatResponse("Posts retrieved successfully", posts, null));
+    } catch (err) {
+        console.error("Error fetching posts:", err);
+        res.status(500).json(
+            formatResponse("Failed to fetch posts", null, err.message)
+        );
+    }
+});
 router.get("/top-tags", async (req, res) => {
     try {
         const topTags = await Post.aggregate([

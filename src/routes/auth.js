@@ -22,6 +22,7 @@ router.post("/register", async (req, res) => {
             username,
             email,
             password: hashedPassword,
+            displayName: username,
         });
 
         await newUser.save();
@@ -66,6 +67,7 @@ router.post("/login", async (req, res) => {
                 avatar: user.profilePicture,
                 displayName: user.displayName,
                 role: user.role,
+                createdAt: user.createdAt,
             },
         });
     } catch (error) {
