@@ -13,7 +13,6 @@ import "dotenv/config";
 const app = express();
 const server = http.createServer(app);
 const io = new SocketIOServer(server, { cors: { origin: "*" } });
-
 // Make io accessible in routes via app.locals
 app.locals.io = io;
 

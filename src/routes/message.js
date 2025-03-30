@@ -1,6 +1,7 @@
 import authMiddleware from "../middlewares/authMiddleware.js";
 import { Router } from "express";
 import Message from "../models/Message.js";
+import { formatResponse } from "../utils/index.js";
 
 const router = Router();
 
@@ -18,9 +19,13 @@ router.post("/", authMiddleware, async (req, res) => {
 
         await message.save();
         req.app.locals.io.emit("newMessage", message);
-        res.status(201).json(message);
+        res.status(201).json(
+            formatResponse("send message successfully", message, null)
+        );
     } catch (error) {
-        res.status(500).json({ message: "Failed to send message", error });
+        res.status(500).json(
+            formatResponse("Failed to send message", null, error.message)
+        );
     }
 });
 
@@ -34,9 +39,13 @@ router.get("/:receiverId", authMiddleware, async (req, res) => {
             ],
         }).sort({ timestamp: 1 });
 
-        res.status(200).json(messages);
+        res.status(200).json(
+            formatResponse("get messages successfully", messages, null)
+        );
     } catch (error) {
-        res.status(500).json({ message: "Failed to fetch messages", error });
+        res.status(500).json(
+            formatResponse("Failed to fetch messages", null, error.message)
+        );
     }
 });
 

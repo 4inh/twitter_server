@@ -7,6 +7,140 @@ import upload from "../config/multer.js";
 import { formatResponse, validateObjectId } from "../utils/index.js";
 
 const router = Router();
+// Search users
+router.get("/search", authMiddleware, async (req, res) => {
+    try {
+        const { q } = req.query;
+
+        if (!q) {
+            return res
+                .status(400)
+                .json(
+                    formatResponse(
+                        "Search query is required",
+                        null,
+                        "QUERY_REQUIRED"
+                    )
+                );
+        }
+
+        const users = await User.find({
+            $or: [
+                { username: { $regex: q, $options: "i" } }, // Case-insensitive username search
+                { displayName: { $regex: q, $options: "i" } }, // Case-insensitive display name search
+                { email: { $regex: q, $options: "i" } }, // Case-insensitive email search
+            ],
+        })
+            .select("username displayName profilePicture") // Only return necessary fields
+            .limit(10); // Limit results
+
+        res.json(formatResponse("Users found", users, null));
+    } catch (err) {
+        console.error("Error searching users:", err);
+        res.status(500).json(
+            formatResponse("Failed to search users", null, err.message)
+        );
+    }
+});
+router.get("/friends", authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).populate(
+            "friends",
+            "username displayName profilePicture email"
+        );
+        if (!user) {
+            return res
+                .status(404)
+                .json(formatResponse("User not found", null, "USER_NOT_FOUND"));
+        }
+        res.json(
+            formatResponse("Get friends successfully", user.friends, null)
+        );
+    } catch (error) {
+        res.status(500).json(
+            formatResponse("Failed to fetch friends", null, err.message)
+        );
+    }
+});
+
+// Add/Remove friend
+router.post("/friends/:id", authMiddleware, async (req, res) => {
+    try {
+        if (!validateObjectId(req.params.id)) {
+            return res
+                .status(400)
+                .json(
+                    formatResponse("Invalid user ID format", null, "INVALID_ID")
+                );
+        }
+
+        // Cannot add yourself as friend
+        if (req.params.id === req.user.id) {
+            return res
+                .status(400)
+                .json(
+                    formatResponse(
+                        "Cannot add yourself as friend",
+                        null,
+                        "INVALID_OPERATION"
+                    )
+                );
+        }
+
+        const targetUser = await User.findById(req.params.id);
+        if (!targetUser) {
+            return res
+                .status(404)
+                .json(formatResponse("User not found", null, "USER_NOT_FOUND"));
+        }
+
+        const currentUser = await User.findById(req.user.id);
+
+        // Check if already friends
+        const isAlreadyFriend = currentUser.friends.includes(req.params.id);
+
+        let updatedUser;
+
+        if (isAlreadyFriend) {
+            // Remove friend
+            updatedUser = await User.findByIdAndUpdate(
+                req.user.id,
+                { $pull: { friends: req.params.id } },
+                { new: true }
+            ).select("-password");
+
+            // Also remove from target user's friends list
+            await User.findByIdAndUpdate(req.params.id, {
+                $pull: { friends: req.user.id },
+            });
+
+            res.json(
+                formatResponse("Friend removed successfully", updatedUser, null)
+            );
+        } else {
+            // Add friend
+            updatedUser = await User.findByIdAndUpdate(
+                req.user.id,
+                { $addToSet: { friends: req.params.id } },
+                { new: true }
+            ).select("-password");
+
+            // Also add to target user's friends list
+            await User.findByIdAndUpdate(req.params.id, {
+                $addToSet: { friends: req.user.id },
+            });
+
+            res.json(
+                formatResponse("Friend added successfully", updatedUser, null)
+            );
+        }
+    } catch (err) {
+        console.error("Error updating friends list:", err);
+        res.status(500).json(
+            formatResponse("Failed to update friends list", null, err.message)
+        );
+    }
+});
 
 // Get all users (admin only)
 router.get("/", authMiddleware, async (req, res) => {
@@ -222,121 +356,6 @@ router.delete("/:id", authMiddleware, async (req, res) => {
         console.error("Error deleting user:", err);
         res.status(500).json(
             formatResponse("Failed to delete user", null, err.message)
-        );
-    }
-});
-
-// Search users
-router.get("/search/users", authMiddleware, async (req, res) => {
-    try {
-        const { q } = req.query;
-
-        if (!q) {
-            return res
-                .status(400)
-                .json(
-                    formatResponse(
-                        "Search query is required",
-                        null,
-                        "QUERY_REQUIRED"
-                    )
-                );
-        }
-
-        const users = await User.find({
-            $or: [
-                { username: { $regex: q, $options: "i" } }, // Case-insensitive username search
-                { displayName: { $regex: q, $options: "i" } }, // Case-insensitive display name search
-                { email: { $regex: q, $options: "i" } }, // Case-insensitive email search
-            ],
-        })
-            .select("username displayName profilePicture") // Only return necessary fields
-            .limit(10); // Limit results
-
-        res.json(formatResponse("Users found", users, null));
-    } catch (err) {
-        console.error("Error searching users:", err);
-        res.status(500).json(
-            formatResponse("Failed to search users", null, err.message)
-        );
-    }
-});
-
-// Add/Remove friend
-router.post("/friends/:id", authMiddleware, async (req, res) => {
-    try {
-        if (!validateObjectId(req.params.id)) {
-            return res
-                .status(400)
-                .json(
-                    formatResponse("Invalid user ID format", null, "INVALID_ID")
-                );
-        }
-
-        // Cannot add yourself as friend
-        if (req.params.id === req.user.id) {
-            return res
-                .status(400)
-                .json(
-                    formatResponse(
-                        "Cannot add yourself as friend",
-                        null,
-                        "INVALID_OPERATION"
-                    )
-                );
-        }
-
-        const targetUser = await User.findById(req.params.id);
-        if (!targetUser) {
-            return res
-                .status(404)
-                .json(formatResponse("User not found", null, "USER_NOT_FOUND"));
-        }
-
-        const currentUser = await User.findById(req.user.id);
-
-        // Check if already friends
-        const isAlreadyFriend = currentUser.friends.includes(req.params.id);
-
-        let updatedUser;
-
-        if (isAlreadyFriend) {
-            // Remove friend
-            updatedUser = await User.findByIdAndUpdate(
-                req.user.id,
-                { $pull: { friends: req.params.id } },
-                { new: true }
-            ).select("-password");
-
-            // Also remove from target user's friends list
-            await User.findByIdAndUpdate(req.params.id, {
-                $pull: { friends: req.user.id },
-            });
-
-            res.json(
-                formatResponse("Friend removed successfully", updatedUser, null)
-            );
-        } else {
-            // Add friend
-            updatedUser = await User.findByIdAndUpdate(
-                req.user.id,
-                { $addToSet: { friends: req.params.id } },
-                { new: true }
-            ).select("-password");
-
-            // Also add to target user's friends list
-            await User.findByIdAndUpdate(req.params.id, {
-                $addToSet: { friends: req.user.id },
-            });
-
-            res.json(
-                formatResponse("Friend added successfully", updatedUser, null)
-            );
-        }
-    } catch (err) {
-        console.error("Error updating friends list:", err);
-        res.status(500).json(
-            formatResponse("Failed to update friends list", null, err.message)
         );
     }
 });

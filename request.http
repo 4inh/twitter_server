@@ -15,6 +15,21 @@ Content-Type: application/json
     "email": "abc@123.com",
     "password": "123456"
 }
+
+###
+POST http://localhost:5000/api/messages
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkNmVkOTcwNTJjMDRmNGE3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzM0OTU5NCwiZXhwIjoxNzQzOTU0Mzk0fQ.iYckj8OFPLJj22OQbsSM8aeNb-T6d2uk0D5_DcrZcjQ
+
+{
+   "receiverId": "67e254dd94f3c746a588d011", 
+   "content": "i'm abc"
+}
+
+###
+GET http://localhost:5000/api/messages/67e254dd94f3c746a588d011
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkNmVkOTcwNTJjMDRmNGE3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzM0OTU5NCwiZXhwIjoxNzQzOTU0Mzk0fQ.iYckj8OFPLJj22OQbsSM8aeNb-T6d2uk0D5_DcrZcjQ
+
 ###
 PUT http://localhost:5000/api/users
 Content-Type: application/json
@@ -39,13 +54,19 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkN
 }
 
 ###
-GET http://localhost:5000/api/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGRkOTRmM2M3NDZhNTg4ZDAxMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzMwMzc2OSwiZXhwIjoxNzQzOTA4NTY5fQ.e_I-SygUSA7fPfDsYDgaE7UDTBK_mdI3G35uNkk6d8o
+GET http://localhost:5000/api/users/friends
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkNmVkOTcwNTJjMDRmNGE3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzM0OTU5NCwiZXhwIjoxNzQzOTU0Mzk0fQ.iYckj8OFPLJj22OQbsSM8aeNb-T6d2uk0D5_DcrZcjQ
 
 
 ###
-GET http://localhost:5000/api/users/67e254c594f3c746a588d00c
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGRkOTRmM2M3NDZhNTg4ZDAxMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzMwMzc2OSwiZXhwIjoxNzQzOTA4NTY5fQ.e_I-SygUSA7fPfDsYDgaE7UDTBK_mdI3G35uNkk6d8o
+POST  http://localhost:5000/api/users/friends/67e254dd94f3c746a588d011
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkNmVkOTcwNTJjMDRmNGE3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzM0ODA0MSwiZXhwIjoxNzQzOTUyODQxfQ.BQLdVpuREnASw5du5rZU7ifxMbP1inBhdI5LGjsvLq0
+
+
+
+###
+GET http://localhost:5000/api/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkNmVkOTcwNTJjMDRmNGE3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzM0ODA0MSwiZXhwIjoxNzQzOTUyODQxfQ.BQLdVpuREnASw5du5rZU7ifxMbP1inBhdI5LGjsvLq0
 
 
 ###
@@ -92,3 +113,4 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkN
 {
     "text": "This is a comment"
 }
+

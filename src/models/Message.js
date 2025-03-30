@@ -18,16 +18,7 @@ const MessageSchema = new Schema(
             trim: true,
         },
         media: {
-            type: [
-                {
-                    url: { type: String, required: true },
-                    type: {
-                        type: String,
-                        enum: ["image", "video"],
-                        required: true,
-                    },
-                },
-            ],
+            type: [{ type: String }],
             default: [],
         },
         timestamp: {
