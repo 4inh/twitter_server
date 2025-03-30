@@ -4,9 +4,9 @@ import { Server as SocketIOServer } from "socket.io";
 import mongoose from "mongoose";
 import cors from "cors";
 import authRoutes from "./routes/auth.js";
+import userRoutes from "./routes/user.js";
 import postRoutes from "./routes/post.js";
 import messageRoutes from "./routes/message.js";
-import { v2 as cloudinary } from "cloudinary";
 
 import "dotenv/config";
 
@@ -19,6 +19,7 @@ app.locals.io = io;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
 const connectMongoDB = () => {
@@ -32,45 +33,12 @@ const connectMongoDB = () => {
 };
 connectMongoDB();
 
-// Configure Cloudinary
-if (
-    !process.env.CLOUDINARY_CLOUD_NAME ||
-    !process.env.CLOUDINARY_API_KEY ||
-    !process.env.CLOUDINARY_API_SECRET
-) {
-    throw new Error(
-        "Missing Cloudinary configuration in environment variables"
-    );
-}
-
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
 // Define routes
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/messages", messageRoutes);
 
-app.post("/api/upload", async (req, res) => {
-    try {
-        console.log({ body: req.body });
-
-        const { file } = req.body;
-        if (!file) return res.status(400).json({ message: "No file provided" });
-
-        const result = await cloudinary.uploader.upload(file, {
-            folder: "uploads",
-        });
-
-        res.json({ url: result.secure_url });
-    } catch (error) {
-        console.error("Cloudinary upload error:", error);
-        res.status(500).json({ message: "Upload failed" });
-    }
-});
 // Handle Socket.io connections
 io.on("connection", (socket) => {
     console.log("New client connected:", socket.id);
