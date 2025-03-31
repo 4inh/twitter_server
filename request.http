@@ -2,18 +2,33 @@ POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
 {
-    "username": "xyz",
+    "username": "linh07",
     "password": "123456",
-    "email" : "xyz@123.com"
+    "email" : "linh07@123.com"
 }
-
+ 
 ###
 POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
 {
-    "email": "abc@123.com",
+    "email": "linh05@123.com",
     "password": "123456"
+}
+
+###
+GET http://localhost:5000/api/notifications
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZWE0ZDVmZjU2MWYxZjhmMTYwMmQyNCIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzNDI3NTA2LCJleHAiOjE3NDQwMzIzMDZ9.fPgfFR09sVwCfYrxfomcFi90JBmx97oPYoZ28Eva0XQ
+
+###
+POST http://localhost:5000/api/notifications/all
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkNmVkOTcwNTJjMDRmNGE3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzQyNzIyNSwiZXhwIjoxNzQ0MDMyMDI1fQ.t-bLU3tDNryXva3VoPDc1oTptNhMf6Xm3rOc6rUrAiI
+
+{
+  "type": "announcement",
+  "message": "We have just updated our platform with new features!"
 }
 
 ###

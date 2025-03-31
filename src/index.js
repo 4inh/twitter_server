@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/user.js";
 import postRoutes from "./routes/post.js";
 import messageRoutes from "./routes/message.js";
+import notificationsRoutes from "./routes/notification.js";
 
 import "dotenv/config";
 
@@ -37,10 +38,14 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/notifications", notificationsRoutes);
 
 // Handle Socket.io connections
 io.on("connection", (socket) => {
     console.log("New client connected:", socket.id);
+    socket.on("join", (userId) => {
+        socket.join(userId); // Join a room with the user's ID for notifications
+    });
     socket.on("disconnect", () => {
         console.log("Client disconnected:", socket.id);
     });

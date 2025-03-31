@@ -10,14 +10,17 @@ router.post("/register", async (req, res) => {
     try {
         const { username, email, password } = req.body;
 
+        // Check if user already exists
         const userExists = await User.findOne({ email });
         if (userExists) {
             return res.status(400).json({ message: "User already exists" });
         }
 
+        // Hash the password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+        // Create new user
         const newUser = new User({
             username,
             email,
@@ -26,8 +29,32 @@ router.post("/register", async (req, res) => {
         });
 
         await newUser.save();
-        res.status(201).json({ message: "User registered successfully" });
+
+        // Generate JWT token
+        if (!process.env.JWT_SECRET) {
+            throw new Error("Missing JWT secret");
+        }
+
+        const token = jwt.sign(
+            { id: newUser._id, role: newUser.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "7d" }
+        );
+
+        // Return token along with user info
+        res.status(201).json({
+            token,
+            user: {
+                _id: newUser._id,
+                username: newUser.username,
+                email: newUser.email,
+                role: newUser.role,
+                profilePicture: newUser.profilePicture,
+                displayName: newUser.displayName,
+            },
+        });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: "Server error" });
     }
 });
