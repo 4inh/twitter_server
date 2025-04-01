@@ -12,14 +12,14 @@ POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
 {
-    "email": "linh05@123.com",
+    "email": "xyz@123.com",
     "password": "123456"
 }
 
 ###
 GET http://localhost:5000/api/notifications
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZWE0ZDVmZjU2MWYxZjhmMTYwMmQyNCIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzNDI3NTA2LCJleHAiOjE3NDQwMzIzMDZ9.fPgfFR09sVwCfYrxfomcFi90JBmx97oPYoZ28Eva0XQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZWE0ZDVmZjU2MWYxZjhmMTYwMmQyNCIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzNDkxNjczLCJleHAiOjE3NDQwOTY0NzN9.7_wYz2N6RSfzM8ryP_6LzqGVVR-kFv30-Ou4x4Qhbig
 
 ###
 POST http://localhost:5000/api/notifications/all
@@ -46,6 +46,11 @@ GET http://localhost:5000/api/messages/67e254dd94f3c746a588d011
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkNmVkOTcwNTJjMDRmNGE3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzM0OTU5NCwiZXhwIjoxNzQzOTU0Mzk0fQ.iYckj8OFPLJj22OQbsSM8aeNb-T6d2uk0D5_DcrZcjQ
 
 ###
+GET http://localhost:5000/api/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGRkOTRmM2M3NDZhNTg4ZDAxMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzQ5NDY4MSwiZXhwIjoxNzQ0MDk5NDgxfQ.o5A83XWFdwsEgBt7HY3gu-2i3ro8_du0OJdF30xjzAQ
+
+
+###
 PUT http://localhost:5000/api/users
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkNmVkOTcwNTJjMDRmNGE3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzMxMjI3OSwiZXhwIjoxNzQzOTE3MDc5fQ.ET0wC9LVto-0jSWyzNqlTg0O4v-_fPE5BTBcvzHYlRs
@@ -54,7 +59,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkN
     "displayName": "abc999@123.com"
 }
 
-
+###
+GET http://localhost:5000/api/posts/user/67ea4d5ff561f1f8f1602d24
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkNmVkOTcwNTJjMDRmNGE3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzQ5MzExMywiZXhwIjoxNzQ0MDk3OTEzfQ.TqzJFhy2kCpqSPSO7dtX8tnBhdGjgEs2vsv_2Jx5N_Y
 ###
 POST http://localhost:5000/api/posts
 Content-Type: application/json
@@ -74,8 +81,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkN
 
 
 ###
-POST  http://localhost:5000/api/users/friends/67e254dd94f3c746a588d011
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkNmVkOTcwNTJjMDRmNGE3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzM0ODA0MSwiZXhwIjoxNzQzOTUyODQxfQ.BQLdVpuREnASw5du5rZU7ifxMbP1inBhdI5LGjsvLq0
+POST  http://localhost:5000/api/users/friends/67ea4d5ff561f1f8f1602d24
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZWE5YzIwZTJmY2NlM2ZmYTRjMDJiYSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzNDkwODQ1LCJleHAiOjE3NDQwOTU2NDV9.K5klQStcGAaBm53QUY6xEEeX8E3to4k0ZZijDTnIoIo
 
 
 

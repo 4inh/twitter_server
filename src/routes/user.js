@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import cloudinary from "../config/cloudinary.js";
 import upload from "../config/multer.js";
 import { formatResponse, validateObjectId } from "../utils/index.js";
+import Notification from "../models/Notification.js";
 
 const router = Router();
 // Search users
@@ -31,7 +32,7 @@ router.get("/search", authMiddleware, async (req, res) => {
                 { email: { $regex: q, $options: "i" } }, // Case-insensitive email search
             ],
         })
-            .select("username displayName profilePicture") // Only return necessary fields
+            .select("username displayName profilePicture email") // Only return necessary fields
             .limit(10); // Limit results
 
         res.json(formatResponse("Users found", users, null));
@@ -107,7 +108,12 @@ router.post("/friends/:id", authMiddleware, async (req, res) => {
                 req.user.id,
                 { $pull: { friends: req.params.id } },
                 { new: true }
-            ).select("-password");
+            )
+                .select("-password")
+                .populate(
+                    "friends",
+                    "username displayName profilePicture email"
+                );
 
             // Also remove from target user's friends list
             await User.findByIdAndUpdate(req.params.id, {
@@ -123,13 +129,26 @@ router.post("/friends/:id", authMiddleware, async (req, res) => {
                 req.user.id,
                 { $addToSet: { friends: req.params.id } },
                 { new: true }
-            ).select("-password");
+            )
+                .select("-password")
+                .populate(
+                    "friends",
+                    "username displayName profilePicture email"
+                );
 
             // Also add to target user's friends list
-            await User.findByIdAndUpdate(req.params.id, {
+            const friendAdded = await User.findByIdAndUpdate(req.params.id, {
                 $addToSet: { friends: req.user.id },
             });
 
+            const newNotification = new Notification({
+                userId: req.params.id,
+                senderId: req.user.id,
+                type: "follow",
+                message: `${updatedUser.email} followed you`, // Custom message
+            });
+
+            await newNotification.save();
             res.json(
                 formatResponse("Friend added successfully", updatedUser, null)
             );
@@ -172,7 +191,7 @@ router.get("/me", authMiddleware, async (req, res) => {
     try {
         const user = await User.findById(req.user.id)
             .select("-password")
-            .populate("friends", "username displayName profilePicture");
+            .populate("friends", "username displayName profilePicture email");
 
         if (!user) {
             return res
@@ -202,7 +221,7 @@ router.get("/:id", authMiddleware, async (req, res) => {
 
         const user = await User.findById(req.params.id)
             .select("-password -role") // Exclude sensitive fields
-            .populate("friends", "username displayName profilePicture");
+            .populate("friends", "username displayName profilePicture email");
 
         if (!user) {
             return res
