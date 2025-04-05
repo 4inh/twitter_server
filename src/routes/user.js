@@ -238,6 +238,35 @@ router.get("/:id", authMiddleware, async (req, res) => {
     }
 });
 
+router.get("/user/:username", authMiddleware, async (req, res) => {
+    try {
+        if (!req.params.username) {
+            return res
+                .status(400)
+                .json(
+                    formatResponse("Missing username", null, "INVALID_USERNAME")
+                );
+        }
+
+        const user = await User.findOne({ username: req.params.username })
+            .select("-password -role") // Exclude sensitive fields
+            .populate("friends", "username displayName profilePicture email");
+
+        if (!user) {
+            return res
+                .status(404)
+                .json(formatResponse("User not found", null, "USER_NOT_FOUND"));
+        }
+
+        res.json(formatResponse("User retrieved successfully", user, null));
+    } catch (err) {
+        console.error("Error fetching user:", err);
+        res.status(500).json(
+            formatResponse("Failed to fetch user", null, err.message)
+        );
+    }
+});
+
 // Update user
 router.put("/", authMiddleware, upload.single("avatar"), async (req, res) => {
     try {

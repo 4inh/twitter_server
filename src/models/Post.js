@@ -8,6 +8,7 @@ const PostSchema = new mongoose.Schema(
         author: { type: Types.ObjectId, ref: "User", required: true }, // Reference to User model
 
         media: [{ type: String }],
+
         likes: [{ type: Types.ObjectId, ref: "User" }], // Users who liked the post
 
         comments: [
@@ -24,9 +25,9 @@ const PostSchema = new mongoose.Schema(
             default: "public",
         },
 
-        tags: [{ type: String, lowercase: true, trim: true }], // Hashtags like ["#ReactJS", "#MERN"]
+        tags: [{ type: String, lowercase: true, trim: true }],
 
-        mentions: [{ type: Types.ObjectId, ref: "User" }], // Users mentioned in the post
+        mentions: [{ type: Types.ObjectId, ref: "User" }],
 
         createdAt: { type: Date, default: Date.now },
         updatedAt: { type: Date },

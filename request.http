@@ -47,7 +47,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkN
 
 ###
 GET http://localhost:5000/api/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGRkOTRmM2M3NDZhNTg4ZDAxMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzQ5NDY4MSwiZXhwIjoxNzQ0MDk5NDgxfQ.o5A83XWFdwsEgBt7HY3gu-2i3ro8_du0OJdF30xjzAQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGRkOTRmM2M3NDZhNTg4ZDAxMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzgzODYwNywiZXhwIjoxNzQ0NDQzNDA3fQ.PU_R7d7NZWxvg-7_4yA3UVwAm4R-MFpY0OnI4cCUBsU
 
 
 ###
@@ -65,13 +65,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkN
 ###
 POST http://localhost:5000/api/posts
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkNmVkOTcwNTJjMDRmNGE3OSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQyODA1MDE2LCJleHAiOjE3NDM0MDk4MTZ9.nCvgx6oDOI6nsKBnP8-nzr3SI6I11DFcnioIZVlEGFg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGRkOTRmM2M3NDZhNTg4ZDAxMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzgzNjcxMCwiZXhwIjoxNzQ0NDQxNTEwfQ.8XlwTVirQzBL1mShnmFMzpLW5qfWqrrRvk3TaAX0geo
 
 {
-    "content": "Hello wolrd",
-    "media": ["https://placehold.co/600x400/FFFFFF/343434/png"],
+    "content": "This post has mention",
     "tags": ["#img"],
-    "mentions": [],
+    "mentions": ["67ea9eabe2fcce3ffa4c02bd"],
     "visibility": "public"
 }
 
@@ -87,8 +86,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZWE5YzIwZ
 
 
 ###
+GET http://localhost:5000/api/users/user/h6
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGRkOTRmM2M3NDZhNTg4ZDAxMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0Mzg0MDk3MSwiZXhwIjoxNzQ0NDQ1NzcxfQ.DmBCsoERwrh9Ki2clfLKjMNhliOXK6mpCDiKdxxKiQw
+
+
+
+###
 GET http://localhost:5000/api/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkNmVkOTcwNTJjMDRmNGE3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzM0ODA0MSwiZXhwIjoxNzQzOTUyODQxfQ.BQLdVpuREnASw5du5rZU7ifxMbP1inBhdI5LGjsvLq0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGRkOTRmM2M3NDZhNTg4ZDAxMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0Mzg0MDk3MSwiZXhwIjoxNzQ0NDQ1NzcxfQ.DmBCsoERwrh9Ki2clfLKjMNhliOXK6mpCDiKdxxKiQw
 
 
 ###

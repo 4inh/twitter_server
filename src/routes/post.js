@@ -39,9 +39,243 @@ const validatePostData = (req, res, next) => {
 
     next();
 };
+// router.post(
+//     "/",
+//     authMiddleware,
+//     upload.array("media"),
+//     validatePostData,
+//     async (req, res) => {
+//         try {
+//             const { content, tags, mentions, visibility } = req.body;
+
+//             const files = req.files ?? [];
+
+//             const uploadPromises = files.map((file) => {
+//                 return new Promise((resolve, reject) => {
+//                     cloudinary.uploader
+//                         .upload_stream({ folder: "posts" }, (error, result) => {
+//                             if (error) return reject(error);
+//                             resolve(result?.secure_url);
+//                         })
+//                         .end(file.buffer);
+//                 });
+//             });
+
+//             const mediaUrls = await Promise.all(uploadPromises);
+//             const cleanUrls = mediaUrls.filter((url) => url);
+
+//             // Parse mentions if provided
+//             let parsedMentions = [];
+//             if (mentions) {
+//                 try {
+//                     parsedMentions = JSON.parse(mentions);
+//                 } catch (error) {
+//                     return res
+//                         .status(400)
+//                         .json(
+//                             formatResponse(
+//                                 "Invalid mentions format",
+//                                 null,
+//                                 "INVALID_MENTIONS"
+//                             )
+//                         );
+//                 }
+//             }
+
+//             // Parse tags if provided
+//             let parsedTags = [];
+//             if (tags) {
+//                 try {
+//                     parsedTags = Array.isArray(tags) ? tags : JSON.parse(tags);
+//                 } catch (error) {
+//                     return res
+//                         .status(400)
+//                         .json(
+//                             formatResponse(
+//                                 "Invalid tags format",
+//                                 null,
+//                                 "INVALID_TAGS"
+//                             )
+//                         );
+//                 }
+//             }
+
+//             const newPost = new Post({
+//                 content,
+//                 author: req.user.id,
+//                 media: cleanUrls,
+//                 tags: parsedTags,
+//                 mentions: parsedMentions,
+//                 visibility: visibility || "public",
+//             });
+
+//             const savedPost = await newPost.save();
+
+//             if (parsedMentions.length > 0) {
+//                 const notifications = parsedMentions.map((userId) => ({
+//                     userId,
+//                     senderId: req.user.id,
+//                     type: "mention",
+//                     postId: savedPost._id,
+//                     message: `You were mentioned in a post by ${req.user.username}.`,
+//                 }));
+
+//                 await Notification.insertMany(notifications);
+
+//                 // Emit real-time notifications
+//                 parsedMentions.forEach((userId) => {
+//                     req.app.locals.io
+//                         .to(userId.toString())
+//                         .emit("notification", {
+//                             message: `You were mentioned in a post.`,
+//                             postId: savedPost._id,
+//                             type: "mention",
+//                             userId,
+//                             senderId: req.user.id,
+//                         });
+//                 });
+//             }
+//             req.app.locals.io.emit("new-post", savedPost);
+
+//             res.status(201).json(
+//                 formatResponse("Post created successfully", savedPost, null)
+//             );
+//         } catch (err) {
+//             console.error("Error creating post:", err);
+//             res.status(500).json(
+//                 formatResponse("Failed to create post", null, err.message)
+//             );
+//         }
+//     }
+// );
 
 // Get all posts
-router.get("/", async (req, res) => {
+router.post(
+    "/",
+    authMiddleware,
+    upload.array("media"),
+    validatePostData,
+    async (req, res) => {
+        try {
+            const { content, tags, mentions, visibility } = req.body;
+
+            const files = req.files ?? [];
+
+            const uploadPromises = files.map((file) => {
+                return new Promise((resolve, reject) => {
+                    cloudinary.uploader
+                        .upload_stream({ folder: "posts" }, (error, result) => {
+                            if (error) return reject(error);
+                            resolve(result?.secure_url);
+                        })
+                        .end(file.buffer);
+                });
+            });
+
+            const mediaUrls = await Promise.all(uploadPromises);
+            const cleanUrls = mediaUrls.filter((url) => url);
+
+            // Parse mentions if provided
+            let parsedMentions = [];
+            if (mentions) {
+                try {
+                    console.log("mentions", mentions);
+
+                    parsedMentions = JSON.parse(mentions);
+                } catch (error) {
+                    return res
+                        .status(400)
+                        .json(
+                            formatResponse(
+                                "Invalid mentions format",
+                                null,
+                                "INVALID_MENTIONS"
+                            )
+                        );
+                }
+            }
+
+            // Parse tags if provided
+            let parsedTags = [];
+            if (tags) {
+                try {
+                    parsedTags = Array.isArray(tags) ? tags : JSON.parse(tags);
+                } catch (error) {
+                    return res
+                        .status(400)
+                        .json(
+                            formatResponse(
+                                "Invalid tags format",
+                                null,
+                                "INVALID_TAGS"
+                            )
+                        );
+                }
+            }
+
+            const newPost = new Post({
+                content,
+                author: req.user.id,
+                media: cleanUrls,
+                tags: parsedTags,
+                mentions: parsedMentions,
+                visibility: visibility || "public",
+            });
+
+            const savedPost = await newPost.save();
+
+            // Populate the saved post with the same fields as in GET route
+            const populatedPost = await Post.findById(savedPost._id)
+                .populate("author", "username email displayName profilePicture")
+                .populate("likes", "username email displayName profilePicture")
+                .populate(
+                    "comments.user",
+                    "username email displayName profilePicture"
+                )
+                .populate(
+                    "mentions",
+                    "username email displayName profilePicture"
+                );
+
+            if (parsedMentions.length > 0) {
+                const notifications = parsedMentions.map((userId) => ({
+                    userId,
+                    senderId: req.user.id,
+                    type: "mention",
+                    postId: savedPost._id,
+                    message: `You were mentioned in a post by ${req.user.username}.`,
+                }));
+
+                await Notification.insertMany(notifications);
+
+                // Emit real-time notifications
+                parsedMentions.forEach((userId) => {
+                    req.app.locals.io
+                        .to(userId.toString())
+                        .emit("notification", {
+                            message: `You were mentioned in a post.`,
+                            postId: savedPost._id,
+                            type: "mention",
+                            userId,
+                            senderId: req.user.id,
+                        });
+                });
+            }
+            // Emit the populated post instead of savedPost
+            req.app.locals.io.emit("new-post", populatedPost);
+
+            res.status(201).json(
+                formatResponse("Post created successfully", populatedPost, null)
+            );
+        } catch (err) {
+            console.error("Error creating post:", err);
+            res.status(500).json(
+                formatResponse("Failed to create post", null, err.message)
+            );
+        }
+    }
+);
+router.get("/", authMiddleware, async (req, res) => {
     try {
         const posts = await Post.find()
             .populate("author", "username email displayName profilePicture")
@@ -117,7 +351,7 @@ router.get("/me", authMiddleware, async (req, res) => {
         );
     }
 });
-router.get("/top-tags", async (req, res) => {
+router.get("/top-tags", authMiddleware, async (req, res) => {
     try {
         const topTags = await Post.aggregate([
             { $unwind: "$tags" }, // Deconstruct the tags array
@@ -137,7 +371,7 @@ router.get("/top-tags", async (req, res) => {
     }
 });
 
-router.get("/search", async (req, res) => {
+router.get("/search", authMiddleware, async (req, res) => {
     try {
         const { query } = req.query;
 
@@ -174,7 +408,7 @@ router.get("/search", async (req, res) => {
         );
     }
 });
-router.get("/:id", async (req, res) => {
+router.get("/:id", authMiddleware, async (req, res) => {
     try {
         // Validate ID format
         if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -208,117 +442,7 @@ router.get("/:id", async (req, res) => {
         );
     }
 });
-
 // Create a new post and emit via Socket.io
-router.post(
-    "/",
-    authMiddleware,
-    upload.array("media"),
-    validatePostData,
-    async (req, res) => {
-        try {
-            const { content, tags, mentions, visibility } = req.body;
-
-            const files = req.files ?? [];
-
-            const uploadPromises = files.map((file) => {
-                return new Promise((resolve, reject) => {
-                    cloudinary.uploader
-                        .upload_stream({ folder: "posts" }, (error, result) => {
-                            if (error) return reject(error);
-                            resolve(result?.secure_url);
-                        })
-                        .end(file.buffer);
-                });
-            });
-
-            const mediaUrls = await Promise.all(uploadPromises);
-            const cleanUrls = mediaUrls.filter((url) => url);
-
-            // Parse mentions if provided
-            let parsedMentions = [];
-            if (mentions) {
-                try {
-                    parsedMentions = JSON.parse(mentions);
-                } catch (error) {
-                    return res
-                        .status(400)
-                        .json(
-                            formatResponse(
-                                "Invalid mentions format",
-                                null,
-                                "INVALID_MENTIONS"
-                            )
-                        );
-                }
-            }
-
-            // Parse tags if provided
-            let parsedTags = [];
-            if (tags) {
-                try {
-                    parsedTags = Array.isArray(tags) ? tags : JSON.parse(tags);
-                } catch (error) {
-                    return res
-                        .status(400)
-                        .json(
-                            formatResponse(
-                                "Invalid tags format",
-                                null,
-                                "INVALID_TAGS"
-                            )
-                        );
-                }
-            }
-
-            const newPost = new Post({
-                content,
-                author: req.user.id,
-                media: cleanUrls,
-                tags: parsedTags,
-                mentions: parsedMentions,
-                visibility: visibility || "public",
-            });
-
-            const savedPost = await newPost.save();
-
-            if (parsedMentions.length > 0) {
-                const notifications = parsedMentions.map((userId) => ({
-                    userId,
-                    senderId: req.user.id,
-                    type: "mention",
-                    postId: savedPost._id,
-                    message: `You were mentioned in a post by ${req.user.username}.`,
-                }));
-
-                await Notification.insertMany(notifications);
-
-                // Emit real-time notifications
-                parsedMentions.forEach((userId) => {
-                    req.app.locals.io
-                        .to(userId.toString())
-                        .emit("notification", {
-                            message: `You were mentioned in a post.`,
-                            postId: savedPost._id,
-                            type: "mention",
-                            userId,
-                            senderId: req.user.id,
-                        });
-                });
-            }
-            req.app.locals.io.emit("new-post", savedPost);
-
-            res.status(201).json(
-                formatResponse("Post created successfully", savedPost, null)
-            );
-        } catch (err) {
-            console.error("Error creating post:", err);
-            res.status(500).json(
-                formatResponse("Failed to create post", null, err.message)
-            );
-        }
-    }
-);
 
 // Update a post
 router.put(
@@ -431,7 +555,7 @@ router.put(
                 { new: true }
             );
 
-            req.app.locals.io.emit("update-post", updatedPost);
+            // req.app.locals.io.emit("update-post", updatedPost);
             res.json(
                 formatResponse("Post updated successfully", updatedPost, null)
             );
