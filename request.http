@@ -2,9 +2,9 @@ POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
 {
-    "username": "abc",
+    "username": "xyz",
     "password": "123456",
-    "email" : "abc@123.com"
+    "email" : "zyx@123.com"
 }
  
 ###
@@ -12,7 +12,7 @@ POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
 {
-    "email": "abc@123.com",
+    "email": "zyx@123.com",
     "password": "123456"
 }
 
@@ -80,8 +80,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGRkO
 
 
 ###
-GET http://localhost:5000/api/users/friends/test
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGM1OTRmM2M3NDZhNTg4ZDAwYyIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzOTA1MTQyLCJleHAiOjE3NDQ1MDk5NDJ9.DPJxYaMYkyQ8x6-MTiYBx68akVc_BS_lZoD0AbY2ImQ
+GET http://localhost:5000/api/users/friends
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZjIxMzg4NDA5MzU2ZGMxY2NjYzUxMSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzOTE3OTk3LCJleHAiOjE3NDQ1MjI3OTd9._SoP86PnrBOxU1ZNZRAh01cOBuBodPkdEKKg4BXJApQ
 
 
 ###
@@ -89,17 +89,15 @@ POST  http://localhost:5000/api/users/friends/67ea9b11995e847155c738ca
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZWE5YzIwZTJmY2NlM2ZmYTRjMDJiYSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzNDkwODQ1LCJleHAiOjE3NDQwOTU2NDV9.K5klQStcGAaBm53QUY6xEEeX8E3to4k0ZZijDTnIoIo
 
 ###
-POST  http://localhost:5000/api/users/follow/67ea9b11995e847155c738ca
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGM1OTRmM2M3NDZhNTg4ZDAwYyIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzOTA1MTQyLCJleHAiOjE3NDQ1MDk5NDJ9.DPJxYaMYkyQ8x6-MTiYBx68akVc_BS_lZoD0AbY2ImQ
-
+POST  http://localhost:5000/api/users/follow/67f21388409356dc1cccc511
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZjIxMzlhNDA5MzU2ZGMxY2NjYzUxNCIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzOTE4NDkwLCJleHAiOjE3NDQ1MjMyOTB9.0eBV683B3z16o1aZg3w-TSuqyAZNWytpGFydLnm81ZI
 # 67ebb3a7e3ca5bc7f5196305
 
 # 67eb9f30909b022a15ea071b
 
 ###
-GET http://localhost:5000/api/users/user/h6
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGRkOTRmM2M3NDZhNTg4ZDAxMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0Mzg0MDk3MSwiZXhwIjoxNzQ0NDQ1NzcxfQ.DmBCsoERwrh9Ki2clfLKjMNhliOXK6mpCDiKdxxKiQw
-
+GET http://localhost:5000/api/users/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZjIxMzlhNDA5MzU2ZGMxY2NjYzUxNCIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzOTE4ODc1LCJleHAiOjE3NDQ1MjM2NzV9.MfSlSWs_zVWzwdx_h7js5vqvVhTRA69wpYhPm3Yd2l4
 
 
 ###

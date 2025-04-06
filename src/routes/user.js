@@ -43,28 +43,28 @@ router.get("/search", authMiddleware, async (req, res) => {
         );
     }
 });
-router.get("/friends", authMiddleware, async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id).populate(
-            "friends",
-            "username displayName profilePicture email"
-        );
-        if (!user) {
-            return res
-                .status(404)
-                .json(formatResponse("User not found", null, "USER_NOT_FOUND"));
-        }
-        res.json(
-            formatResponse("Get friends successfully", user.friends, null)
-        );
-    } catch (error) {
-        res.status(500).json(
-            formatResponse("Failed to fetch friends", null, err.message)
-        );
-    }
-});
+// router.get("/friends", authMiddleware, async (req, res) => {
+//     try {
+//         const user = await User.findById(req.user.id).populate(
+//             "friends",
+//             "username displayName profilePicture email"
+//         );
+//         if (!user) {
+//             return res
+//                 .status(404)
+//                 .json(formatResponse("User not found", null, "USER_NOT_FOUND"));
+//         }
+//         res.json(
+//             formatResponse("Get friends successfully", user.friends, null)
+//         );
+//     } catch (error) {
+//         res.status(500).json(
+//             formatResponse("Failed to fetch friends", null, err.message)
+//         );
+//     }
+// });
 
-router.get("/friends/test", authMiddleware, async (req, res) => {
+router.get("/friends", authMiddleware, async (req, res) => {
     try {
         const currentUser = await User.findById(req.user.id)
             .select("following followers")
@@ -423,7 +423,26 @@ router.get("/me", authMiddleware, async (req, res) => {
     try {
         const user = await User.findById(req.user.id)
             .select("-password")
-            .populate("friends", "username displayName profilePicture email");
+            // .populate("friends", "username displayName profilePicture email")
+            .populate("followers", "username displayName profilePicture email")
+            .populate("following", "username displayName profilePicture email");
+        // console.log("user", user);
+
+        const mutualConnections = user.following.filter((userId) =>
+            user.followers.some(
+                (followerId) => followerId.toString() === userId.toString()
+            )
+        );
+        // console.log("mutualConnections", mutualConnections);
+
+        // // Get detailed information about these mutual friends
+        // const friends = await User.find(
+        //     { _id: { $in: mutualConnections } },
+        //     "username displayName profilePicture email"
+        // ).lean();
+        // console.log("friends", friends);
+
+        user.friends = mutualConnections;
 
         if (!user) {
             return res
@@ -453,8 +472,9 @@ router.get("/:id", authMiddleware, async (req, res) => {
 
         const user = await User.findById(req.params.id)
             .select("-password -role") // Exclude sensitive fields
-            .populate("friends", "username displayName profilePicture email");
-
+            .populate("friends", "username displayName profilePicture email")
+            .populate("followers", "username displayName profilePicture email")
+            .populate("following", "username displayName profilePicture email");
         if (!user) {
             return res
                 .status(404)
@@ -482,7 +502,9 @@ router.get("/user/:username", authMiddleware, async (req, res) => {
 
         const user = await User.findOne({ username: req.params.username })
             .select("-password -role") // Exclude sensitive fields
-            .populate("friends", "username displayName profilePicture email");
+            .populate("friends", "username displayName profilePicture email")
+            .populate("followers", "username displayName profilePicture email")
+            .populate("following", "username displayName profilePicture email");
 
         if (!user) {
             return res
