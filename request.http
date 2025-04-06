@@ -2,9 +2,9 @@ POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
 {
-    "username": "linh07",
+    "username": "xyz",
     "password": "123456",
-    "email" : "linh07@123.com"
+    "email" : "zyx@123.com"
 }
  
 ###
@@ -12,7 +12,7 @@ POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
 {
-    "email": "xyz@123.com",
+    "email": "zyx@123.com",
     "password": "123456"
 }
 
@@ -47,7 +47,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkN
 
 ###
 GET http://localhost:5000/api/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGRkOTRmM2M3NDZhNTg4ZDAxMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzQ5NDY4MSwiZXhwIjoxNzQ0MDk5NDgxfQ.o5A83XWFdwsEgBt7HY3gu-2i3ro8_du0OJdF30xjzAQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGRkOTRmM2M3NDZhNTg4ZDAxMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzgzODYwNywiZXhwIjoxNzQ0NDQzNDA3fQ.PU_R7d7NZWxvg-7_4yA3UVwAm4R-MFpY0OnI4cCUBsU
 
 
 ###
@@ -65,30 +65,44 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkN
 ###
 POST http://localhost:5000/api/posts
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkNmVkOTcwNTJjMDRmNGE3OSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQyODA1MDE2LCJleHAiOjE3NDM0MDk4MTZ9.nCvgx6oDOI6nsKBnP8-nzr3SI6I11DFcnioIZVlEGFg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGRkOTRmM2M3NDZhNTg4ZDAxMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzgzNjcxMCwiZXhwIjoxNzQ0NDQxNTEwfQ.8XlwTVirQzBL1mShnmFMzpLW5qfWqrrRvk3TaAX0geo
 
 {
-    "content": "Hello wolrd",
-    "media": ["https://placehold.co/600x400/FFFFFF/343434/png"],
+    "content": "This post has mention",
     "tags": ["#img"],
-    "mentions": [],
+    "mentions": ["67ea9eabe2fcce3ffa4c02bd"],
     "visibility": "public"
 }
 
 ###
-GET http://localhost:5000/api/users/friends
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkNmVkOTcwNTJjMDRmNGE3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzM0OTU5NCwiZXhwIjoxNzQzOTU0Mzk0fQ.iYckj8OFPLJj22OQbsSM8aeNb-T6d2uk0D5_DcrZcjQ
+GET http://localhost:5000/api/posts/search?query=img
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGRkOTRmM2M3NDZhNTg4ZDAxMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzkwMTgyNCwiZXhwIjoxNzQ0NTA2NjI0fQ.cV4zI2nRSzCPs41rfYB-EKL8HwZOPv5Vm7cRGPXA43g
 
 
 ###
-POST  http://localhost:5000/api/users/friends/67ea4d5ff561f1f8f1602d24
+GET http://localhost:5000/api/users/friends
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZjIxMzg4NDA5MzU2ZGMxY2NjYzUxMSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzOTE3OTk3LCJleHAiOjE3NDQ1MjI3OTd9._SoP86PnrBOxU1ZNZRAh01cOBuBodPkdEKKg4BXJApQ
+
+
+###
+POST  http://localhost:5000/api/users/friends/67ea9b11995e847155c738ca
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZWE5YzIwZTJmY2NlM2ZmYTRjMDJiYSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzNDkwODQ1LCJleHAiOjE3NDQwOTU2NDV9.K5klQStcGAaBm53QUY6xEEeX8E3to4k0ZZijDTnIoIo
 
+###
+POST  http://localhost:5000/api/users/follow/67f21388409356dc1cccc511
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZjIxMzlhNDA5MzU2ZGMxY2NjYzUxNCIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzOTE4NDkwLCJleHAiOjE3NDQ1MjMyOTB9.0eBV683B3z16o1aZg3w-TSuqyAZNWytpGFydLnm81ZI
+# 67ebb3a7e3ca5bc7f5196305
+
+# 67eb9f30909b022a15ea071b
+
+###
+GET http://localhost:5000/api/users/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZjIxMzlhNDA5MzU2ZGMxY2NjYzUxNCIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzOTE4ODc1LCJleHAiOjE3NDQ1MjM2NzV9.MfSlSWs_zVWzwdx_h7js5vqvVhTRA69wpYhPm3Yd2l4
 
 
 ###
 GET http://localhost:5000/api/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2QzYWJkNmVkOTcwNTJjMDRmNGE3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzM0ODA0MSwiZXhwIjoxNzQzOTUyODQxfQ.BQLdVpuREnASw5du5rZU7ifxMbP1inBhdI5LGjsvLq0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTI1NGRkOTRmM2M3NDZhNTg4ZDAxMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0Mzg0MDk3MSwiZXhwIjoxNzQ0NDQ1NzcxfQ.DmBCsoERwrh9Ki2clfLKjMNhliOXK6mpCDiKdxxKiQw
 
 
 ###

@@ -37,6 +37,15 @@ const UserSchema = new mongoose.Schema(
             enum: ["user", "admin"],
             default: "user",
         },
+        dayOfBirth: {
+            type: Date,
+        },
+        phoneNumber: {
+            type: String,
+            default: "",
+        },
+        following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+        followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
         friends: [
             {
                 type: mongoose.Schema.Types.ObjectId,
