@@ -145,7 +145,7 @@ router.post("/friends/:id", authMiddleware, async (req, res) => {
                 userId: req.params.id,
                 senderId: req.user.id,
                 type: "follow",
-                message: `${updatedUser.email} followed you`, // Custom message
+                message: `${updatedUser.email} đã theo dõi bạn`, // Custom message
             });
 
             await newNotification.save();
