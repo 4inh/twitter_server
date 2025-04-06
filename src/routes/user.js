@@ -343,6 +343,10 @@ router.post("/follow/:id", authMiddleware, async (req, res) => {
                 .populate(
                     "following",
                     "username displayName profilePicture email"
+                )
+                .populate(
+                    "followers",
+                    "username displayName profilePicture email"
                 );
 
             // Remove from target user's followers list
@@ -363,6 +367,10 @@ router.post("/follow/:id", authMiddleware, async (req, res) => {
                 .select("-password")
                 .populate(
                     "following",
+                    "username displayName profilePicture email"
+                )
+                .populate(
+                    "followers",
                     "username displayName profilePicture email"
                 );
 
