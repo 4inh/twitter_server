@@ -392,12 +392,19 @@ router.get("/search", authMiddleware, async (req, res) => {
                 { tags: { $regex: query, $options: "i" } }, // Search by tag
                 { content: { $regex: query, $options: "i" } }, // Search by content
             ],
+            visibility: "public",
         })
             .populate({
                 path: "author",
                 match: { username: { $regex: query, $options: "i" } }, // Search by username
-                select: "username email",
+                select: "username email displayName profilePicture",
             })
+            .populate("likes", "username email displayName profilePicture")
+            .populate(
+                "comments.user",
+                "username email displayName profilePicture"
+            )
+            .populate("mentions", "username email displayName profilePicture")
             .sort({ createdAt: -1 });
 
         res.json(formatResponse("Search results retrieved", posts, null));
