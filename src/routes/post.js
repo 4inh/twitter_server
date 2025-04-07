@@ -253,7 +253,7 @@ router.post(
                     req.app.locals.io
                         .to(userId.toString())
                         .emit("notification", {
-                            message: `You were mentioned in a post.`,
+                            message: `Bạn đã được nhắc đến trong một bài đăng.`,
                             postId: savedPost._id,
                             type: "mention",
                             userId,
