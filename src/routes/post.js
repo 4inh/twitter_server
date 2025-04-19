@@ -39,116 +39,6 @@ const validatePostData = (req, res, next) => {
 
     next();
 };
-// router.post(
-//     "/",
-//     authMiddleware,
-//     upload.array("media"),
-//     validatePostData,
-//     async (req, res) => {
-//         try {
-//             const { content, tags, mentions, visibility } = req.body;
-
-//             const files = req.files ?? [];
-
-//             const uploadPromises = files.map((file) => {
-//                 return new Promise((resolve, reject) => {
-//                     cloudinary.uploader
-//                         .upload_stream({ folder: "posts" }, (error, result) => {
-//                             if (error) return reject(error);
-//                             resolve(result?.secure_url);
-//                         })
-//                         .end(file.buffer);
-//                 });
-//             });
-
-//             const mediaUrls = await Promise.all(uploadPromises);
-//             const cleanUrls = mediaUrls.filter((url) => url);
-
-//             // Parse mentions if provided
-//             let parsedMentions = [];
-//             if (mentions) {
-//                 try {
-//                     parsedMentions = JSON.parse(mentions);
-//                 } catch (error) {
-//                     return res
-//                         .status(400)
-//                         .json(
-//                             formatResponse(
-//                                 "Invalid mentions format",
-//                                 null,
-//                                 "INVALID_MENTIONS"
-//                             )
-//                         );
-//                 }
-//             }
-
-//             // Parse tags if provided
-//             let parsedTags = [];
-//             if (tags) {
-//                 try {
-//                     parsedTags = Array.isArray(tags) ? tags : JSON.parse(tags);
-//                 } catch (error) {
-//                     return res
-//                         .status(400)
-//                         .json(
-//                             formatResponse(
-//                                 "Invalid tags format",
-//                                 null,
-//                                 "INVALID_TAGS"
-//                             )
-//                         );
-//                 }
-//             }
-
-//             const newPost = new Post({
-//                 content,
-//                 author: req.user.id,
-//                 media: cleanUrls,
-//                 tags: parsedTags,
-//                 mentions: parsedMentions,
-//                 visibility: visibility || "public",
-//             });
-
-//             const savedPost = await newPost.save();
-
-//             if (parsedMentions.length > 0) {
-//                 const notifications = parsedMentions.map((userId) => ({
-//                     userId,
-//                     senderId: req.user.id,
-//                     type: "mention",
-//                     postId: savedPost._id,
-//                     message: `You were mentioned in a post by ${req.user.username}.`,
-//                 }));
-
-//                 await Notification.insertMany(notifications);
-
-//                 // Emit real-time notifications
-//                 parsedMentions.forEach((userId) => {
-//                     req.app.locals.io
-//                         .to(userId.toString())
-//                         .emit("notification", {
-//                             message: `You were mentioned in a post.`,
-//                             postId: savedPost._id,
-//                             type: "mention",
-//                             userId,
-//                             senderId: req.user.id,
-//                         });
-//                 });
-//             }
-//             req.app.locals.io.emit("new-post", savedPost);
-
-//             res.status(201).json(
-//                 formatResponse("Post created successfully", savedPost, null)
-//             );
-//         } catch (err) {
-//             console.error("Error creating post:", err);
-//             res.status(500).json(
-//                 formatResponse("Failed to create post", null, err.message)
-//             );
-//         }
-//     }
-// );
-
 // Get all posts
 router.post(
     "/",
@@ -352,12 +242,13 @@ router.get("/me", authMiddleware, async (req, res) => {
     }
 });
 router.get("/top-tags", authMiddleware, async (req, res) => {
+    const limit = parseInt(req.query.limit) || 5;
     try {
         const topTags = await Post.aggregate([
             { $unwind: "$tags" }, // Deconstruct the tags array
             { $group: { _id: "$tags", count: { $sum: 1 } } }, // Count each tag
             { $sort: { count: -1 } }, // Sort by count descending
-            { $limit: 5 }, // Get top 5
+            { $limit: limit }, // Get top limit
         ]);
 
         res.json(
@@ -762,14 +653,7 @@ router.post("/:id/comment", authMiddleware, async (req, res) => {
         });
 
         res.status(201).json(
-            formatResponse(
-                "Comment added successfully",
-                {
-                    post: updatedPost,
-                    comment: addedComment,
-                },
-                null
-            )
+            formatResponse("Comment added successfully", updatedPost, null)
         );
     } catch (err) {
         console.error("Error adding comment:", err);

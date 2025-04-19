@@ -43,26 +43,6 @@ router.get("/search", authMiddleware, async (req, res) => {
         );
     }
 });
-// router.get("/friends", authMiddleware, async (req, res) => {
-//     try {
-//         const user = await User.findById(req.user.id).populate(
-//             "friends",
-//             "username displayName profilePicture email"
-//         );
-//         if (!user) {
-//             return res
-//                 .status(404)
-//                 .json(formatResponse("User not found", null, "USER_NOT_FOUND"));
-//         }
-//         res.json(
-//             formatResponse("Get friends successfully", user.friends, null)
-//         );
-//     } catch (error) {
-//         res.status(500).json(
-//             formatResponse("Failed to fetch friends", null, err.message)
-//         );
-//     }
-// });
 
 router.get("/friends", authMiddleware, async (req, res) => {
     try {
@@ -98,201 +78,36 @@ router.get("/friends", authMiddleware, async (req, res) => {
     }
 });
 
-// Add/Remove friend
-// router.post("/friends/:id", authMiddleware, async (req, res) => {
-//     try {
-//         if (!validateObjectId(req.params.id)) {
-//             return res
-//                 .status(400)
-//                 .json(
-//                     formatResponse("Invalid user ID format", null, "INVALID_ID")
-//                 );
-//         }
+router.get("/most-followers", authMiddleware, async (req, res) => {
+    try {
+        const topUsers = await User.aggregate([
+            {
+                $project: {
+                    username: 1,
+                    displayName: 1,
+                    profilePicture: 1,
+                    followersCount: { $size: "$followers" },
+                },
+            },
+            { $sort: { followersCount: -1 } },
+            { $limit: 5 },
+        ]);
 
-//         // Cannot add yourself as friend
-//         if (req.params.id === req.user.id) {
-//             return res
-//                 .status(400)
-//                 .json(
-//                     formatResponse(
-//                         "Cannot add yourself as friend",
-//                         null,
-//                         "INVALID_OPERATION"
-//                     )
-//                 );
-//         }
+        res.json(
+            formatResponse(
+                "Most followers retrieved successfully",
+                topUsers,
+                null
+            )
+        );
+    } catch (err) {
+        console.error("Error fetching friends:", err);
+        res.status(500).json(
+            formatResponse("Failed to fetch friends", null, err.message)
+        );
+    }
+});
 
-//         const targetUser = await User.findById(req.params.id);
-//         if (!targetUser) {
-//             return res
-//                 .status(404)
-//                 .json(formatResponse("User not found", null, "USER_NOT_FOUND"));
-//         }
-
-//         const currentUser = await User.findById(req.user.id);
-
-//         // Check if already friends
-//         const isAlreadyFriend = currentUser.friends.includes(req.params.id);
-
-//         let updatedUser;
-
-//         if (isAlreadyFriend) {
-//             // Remove friend
-//             updatedUser = await User.findByIdAndUpdate(
-//                 req.user.id,
-//                 { $pull: { friends: req.params.id } },
-//                 { new: true }
-//             )
-//                 .select("-password")
-//                 .populate(
-//                     "friends",
-//                     "username displayName profilePicture email"
-//                 );
-
-//             // Also remove from target user's friends list
-//             await User.findByIdAndUpdate(req.params.id, {
-//                 $pull: { friends: req.user.id },
-//             });
-
-//             res.json(
-//                 formatResponse("Friend removed successfully", updatedUser, null)
-//             );
-//         } else {
-//             // Add friend
-//             updatedUser = await User.findByIdAndUpdate(
-//                 req.user.id,
-//                 { $addToSet: { friends: req.params.id } },
-//                 { new: true }
-//             )
-//                 .select("-password")
-//                 .populate(
-//                     "friends",
-//                     "username displayName profilePicture email"
-//                 );
-
-//             // Also add to target user's friends list
-//             const friendAdded = await User.findByIdAndUpdate(req.params.id, {
-//                 $addToSet: { friends: req.user.id },
-//             });
-
-//             const newNotification = new Notification({
-//                 userId: req.params.id,
-//                 senderId: req.user.id,
-//                 type: "follow",
-//                 message: `${updatedUser.email} followed you`, // Custom message
-//             });
-
-//             await newNotification.save();
-//             res.json(
-//                 formatResponse("Friend added successfully", updatedUser, null)
-//             );
-//         }
-//     } catch (err) {
-//         console.error("Error updating friends list:", err);
-//         res.status(500).json(
-//             formatResponse("Failed to update friends list", null, err.message)
-//         );
-//     }
-// });
-
-// router.post("/follow/:id", authMiddleware, async (req, res) => {
-//     try {
-//         if (!validateObjectId(req.params.id)) {
-//             return res
-//                 .status(400)
-//                 .json(
-//                     formatResponse("Invalid user ID format", null, "INVALID_ID")
-//                 );
-//         }
-
-//         // Cannot follow yourself
-//         if (req.params.id === req.user.id) {
-//             return res
-//                 .status(400)
-//                 .json(
-//                     formatResponse(
-//                         "Cannot follow yourself",
-//                         null,
-//                         "INVALID_OPERATION"
-//                     )
-//                 );
-//         }
-
-//         const targetUser = await User.findById(req.params.id);
-//         if (!targetUser) {
-//             return res
-//                 .status(404)
-//                 .json(formatResponse("User not found", null, "USER_NOT_FOUND"));
-//         }
-
-//         const currentUser = await User.findById(req.user.id);
-
-//         // Check if already following
-//         const isAlreadyFollowing = currentUser.friends.includes(req.params.id);
-
-//         let updatedUser;
-
-//         if (isAlreadyFollowing) {
-//             // Unfollow user
-//             updatedUser = await User.findByIdAndUpdate(
-//                 req.user.id,
-//                 { $pull: { friends: req.params.id } },
-//                 { new: true }
-//             )
-//                 .select("-password")
-//                 .populate(
-//                     "friends",
-//                     "username displayName profilePicture email"
-//                 );
-
-//             // Remove from target user's followers list
-//             // await User.findByIdAndUpdate(req.params.id, {
-//             //     $pull: { friends: req.user.id },
-//             // });
-
-//             res.json(
-//                 formatResponse("Unfollowed successfully", updatedUser, null)
-//             );
-//         } else {
-//             // Follow user
-//             updatedUser = await User.findByIdAndUpdate(
-//                 req.user.id,
-//                 { $addToSet: { friends: req.params.id } },
-//                 { new: true }
-//             )
-//                 .select("-password")
-//                 .populate(
-//                     "friends",
-//                     "username displayName profilePicture email"
-//                 );
-
-//             // Add to target user's followers list
-//             // await User.findByIdAndUpdate(req.params.id, {
-//             //     $addToSet: { friends: req.user.id },
-//             // });
-
-//             // Create notification for the target user
-//             const newNotification = new Notification({
-//                 userId: req.params.id,
-//                 senderId: req.user.id,
-//                 type: "follow",
-//                 message: `${
-//                     currentUser.email || currentUser.username
-//                 } followed you`,
-//             });
-
-//             await newNotification.save();
-//             res.json(
-//                 formatResponse("Following successfully", updatedUser, null)
-//             );
-//         }
-//     } catch (err) {
-//         console.error("Error updating follow status:", err);
-//         res.status(500).json(
-//             formatResponse("Failed to update follow status", null, err.message)
-//         );
-//     }
-// });
 router.post("/follow/:id", authMiddleware, async (req, res) => {
     try {
         if (!validateObjectId(req.params.id)) {
