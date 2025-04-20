@@ -39,7 +39,6 @@ const validatePostData = (req, res, next) => {
 
     next();
 };
-// Get all posts
 router.post(
     "/",
     authMiddleware,
@@ -167,6 +166,17 @@ router.post(
 );
 router.get("/", authMiddleware, async (req, res) => {
     try {
+        // Get pagination parameters from query string with defaults
+        const page = parseInt(req.query.page) || 1; // Default to first page
+        const limit = parseInt(req.query.limit) || 10; // Default to 10 posts per page
+
+        // Calculate skip value for pagination
+        const skip = (page - 1) * limit;
+
+        // Count total documents for pagination metadata
+        const totalPosts = await Post.countDocuments();
+
+        // Get paginated posts
         const posts = await Post.find()
             .populate("author", "username email displayName profilePicture")
             .populate("likes", "username email displayName profilePicture")
@@ -175,9 +185,27 @@ router.get("/", authMiddleware, async (req, res) => {
                 "username email displayName profilePicture"
             )
             .populate("mentions", "username email displayName profilePicture")
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
 
-        res.json(formatResponse("Posts retrieved successfully", posts, null));
+        // Create pagination metadata
+        const pagination = {
+            totalPosts,
+            totalPages: Math.ceil(totalPosts / limit),
+            currentPage: page,
+            postsPerPage: limit,
+            hasNextPage: page < Math.ceil(totalPosts / limit),
+            hasPrevPage: page > 1,
+        };
+
+        res.json(
+            formatResponse(
+                "Posts retrieved successfully",
+                { posts, pagination },
+                null
+            )
+        );
     } catch (err) {
         console.error("Error fetching posts:", err);
         res.status(500).json(
